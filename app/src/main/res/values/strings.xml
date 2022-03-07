@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">checker</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="search_tab_title">Search</string>
+    <string name="tracked_list_tab_title">Tracked</string>
+
+    <string name="view_pager">Tracked</string>
+
+</resources>
