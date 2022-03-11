@@ -13,14 +13,21 @@ import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.codesample.checker.adapters.SearchAdsAdapter
 import com.codesample.checker.databinding.FragmentSearchBinding
 import com.codesample.checker.viewmodels.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
+    private val adapter = SearchAdsAdapter()
+    private var searchJob: Job? = null
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -29,6 +36,7 @@ class SearchFragment : Fragment() {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
 
         setupSearchView(binding.searchView)
+        binding.adsList.adapter = adapter
 
         return binding.root
     }
@@ -40,7 +48,7 @@ class SearchFragment : Fragment() {
 
         searchView.setSearchableInfo(searchConfig)
 
-        val adapter = SimpleCursorAdapter(
+        val scAdapter = SimpleCursorAdapter(
             activity,
             R.layout.suggestion_item,
             createMatrixCursor(),
@@ -49,7 +57,7 @@ class SearchFragment : Fragment() {
             0
         )
 
-        searchView.suggestionsAdapter = adapter
+        searchView.suggestionsAdapter = scAdapter
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
@@ -73,7 +81,7 @@ class SearchFragment : Fragment() {
             override fun onSuggestionSelect(position: Int) = false
 
             override fun onSuggestionClick(position: Int): Boolean {
-                val cursor = adapter.cursor
+                val cursor = scAdapter.cursor
                 cursor.moveToFirst()
                 cursor.move(position)
                 val query = cursor.getString(1)
@@ -88,19 +96,24 @@ class SearchFragment : Fragment() {
             for (i in 0..lastIdx) {
                 cursor.addRow(arrayOf(i, it[i]))
             }
-            adapter.swapCursor(cursor)
+            scAdapter.swapCursor(cursor)
         })
+
+        searchView.setQuery(viewModel.lastQuery, true)
     }
 
-    private fun createMatrixCursor(): MatrixCursor {
-        return MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
-    }
+    private fun createMatrixCursor() = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
 
-    private fun handleQuery(query: String) {
-        //TODO: Handle query
+    private fun handleQuery(query: String?) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            viewModel.searchAds(query).collectLatest {
+                adapter.submitData(it)
+            }
+        }
     }
 
     private fun clearQuery() {
-        //TODO: Clear query
+        handleQuery(null)
     }
 }

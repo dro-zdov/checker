@@ -20,7 +20,6 @@ interface AvitoService {
         @Query("page") page: Int,
         @Query("limit") limit: Int,
         @Query("key") key: String,
-        @Query("locationId") locationId: String,
     ): AvitoResponce
 
     @POST("api/2/suggest/mav")
