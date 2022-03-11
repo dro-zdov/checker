@@ -7,4 +7,8 @@
 
     <string name="view_pager">Tracked</string>
 
+    <string name="search_hint">Search ads</string>
+
+    <string name="avito_key">af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir</string>
+
 </resources>

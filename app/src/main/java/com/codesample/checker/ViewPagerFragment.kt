@@ -11,7 +11,9 @@ import com.codesample.checker.adapters.SEARCH_PAGE_INDEX
 import com.codesample.checker.adapters.ViewPagerAdapter
 import com.codesample.checker.databinding.FragmentViewPagerBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ViewPagerFragment: Fragment() {
 
     override fun onCreateView(
