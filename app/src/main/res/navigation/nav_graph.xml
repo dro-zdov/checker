@@ -3,13 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/ViewPager">
+    app:startDestination="@id/viewPager">
 
     <fragment
-        android:id="@+id/ViewPager"
+        android:id="@+id/viewPager"
         android:name="com.codesample.checker.ViewPagerFragment"
         tools:layout="@layout/fragment_view_pager">
 
+        <action
+            android:id="@+id/actionViewPagerFragmentToAdDetailFragment"
+            app:destination="@id/adDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adDetailFragment"
+        android:name="com.codesample.checker.AdDetailFragment"
+        tools:layout="@layout/fragment_ad_detail">
+
+        <argument
+            android:name="adId"
+            app:argType="long" />
     </fragment>
 
 </navigation>

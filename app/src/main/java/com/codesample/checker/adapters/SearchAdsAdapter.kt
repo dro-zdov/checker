@@ -1,10 +1,13 @@
 package com.codesample.checker.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.codesample.checker.ViewPagerFragmentDirections
 import com.codesample.checker.databinding.SearchAdsItemBinding
 import com.codesample.checker.entities.Item
 
@@ -28,6 +31,18 @@ class SearchAdsAdapter: PagingDataAdapter<Item, SearchAdsViewHolder>(SearchAdsDi
 class SearchAdsViewHolder(
     private val binding: SearchAdsItemBinding
 ) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.setClickListener { view ->
+            binding.item?.let { item ->
+                navigateToAd(item, view)
+            }
+        }
+    }
+
+    private fun navigateToAd(item: Item, view: View) {
+        val direction = ViewPagerFragmentDirections.actionViewPagerFragmentToAdDetailFragment(item.value.id)
+        view.findNavController().navigate(direction)
+    }
 
     fun bind(item: Item) {
         binding.item = item

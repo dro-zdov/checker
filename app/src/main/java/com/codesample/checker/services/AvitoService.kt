@@ -1,6 +1,7 @@
 package com.codesample.checker.services
 
 import com.codesample.checker.entities.AvitoResponce
+import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.entities.suggestion.SuggestionRequest
 import com.codesample.checker.entities.suggestion.SuggestionResult
 import okhttp3.OkHttpClient
@@ -8,10 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface AvitoService {
     @GET("api/11/items")
@@ -21,6 +19,12 @@ interface AvitoService {
         @Query("limit") limit: Int,
         @Query("key") key: String,
     ): AvitoResponce
+
+    @GET("api/11/items/{id}")
+    suspend fun getAdDetails(
+        @Path("id") id: Long,
+        @Query("key") key: String,
+    ): AdDetails
 
     @POST("api/2/suggest/mav")
     suspend fun searchSuggestions(

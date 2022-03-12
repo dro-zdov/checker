@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.codesample.checker.entities.Item
+import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.entities.suggestion.SuggestionRequest
 import com.codesample.checker.services.AvitoService
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,8 @@ class AvitoRepository @Inject constructor(
             pagingSourceFactory = { SearchAdsPagingSource(service, query, key) }
         ).flow
     }
+
+    suspend fun getAdDetails(id: Long) = service.getAdDetails(id, key)
 
     suspend fun searchSuggestions(query: String): List<String> {
         val body = SuggestionRequest(

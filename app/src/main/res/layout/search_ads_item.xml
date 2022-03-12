@@ -7,11 +7,15 @@
         <variable
             name="item"
             type="com.codesample.checker.entities.Item"/>
+        <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{clickListener}"
         android:padding="2dp">
 
         <androidx.constraintlayout.widget.Guideline
