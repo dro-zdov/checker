@@ -2,7 +2,7 @@ package com.codesample.checker.repo
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.codesample.checker.entities.Item
+import com.codesample.checker.entities.search.Item
 import com.codesample.checker.services.AvitoService
 
 class SearchAdsPagingSource(

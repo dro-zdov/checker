@@ -6,7 +6,7 @@
     <data>
         <variable
             name="item"
-            type="com.codesample.checker.entities.Item"/>
+            type="com.codesample.checker.entities.search.Item"/>
         <variable
             name="clickListener"
             type="android.view.View.OnClickListener"/>
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
-            app:imageFromUrl="@{item.value.images.main.get75x55()}"
+            app:imageFromUrl="@{item.value.images.main.img75x55}"
             app:layout_constraintDimensionRatio="4:3"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"

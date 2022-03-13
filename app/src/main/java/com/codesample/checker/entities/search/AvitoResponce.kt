@@ -1,4 +1,4 @@
-package com.codesample.checker.entities
+package com.codesample.checker.entities.search
 
 data class AvitoResponce(
     val result: Result,

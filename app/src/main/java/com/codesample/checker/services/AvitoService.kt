@@ -1,6 +1,6 @@
 package com.codesample.checker.services
 
-import com.codesample.checker.entities.AvitoResponce
+import com.codesample.checker.entities.search.AvitoResponce
 import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.entities.suggestion.SuggestionRequest
 import com.codesample.checker.entities.suggestion.SuggestionResult

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.codesample.checker.ViewPagerFragmentDirections
 import com.codesample.checker.databinding.SearchAdsItemBinding
-import com.codesample.checker.entities.Item
+import com.codesample.checker.entities.search.Item
 
 class SearchAdsAdapter: PagingDataAdapter<Item, SearchAdsViewHolder>(SearchAdsDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchAdsViewHolder {
