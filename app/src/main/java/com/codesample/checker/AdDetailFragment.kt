@@ -41,6 +41,10 @@ class AdDetailFragment : Fragment() {
             view.findNavController().navigateUp()
         }
 
+        binding.callback = Callback { adDetails ->
+            //TODO: save to db
+        }
+
         return binding.root
     }
 
@@ -98,5 +102,9 @@ class AdDetailFragment : Fragment() {
         val layout = LayoutInflater.from(requireContext()).inflate(R.layout.ad_detail_image, null) as ConstraintLayout
         val view = layout.findViewById<ImageView>(R.id.imagePlaceholder)
         return view.layoutParams as ConstraintLayout.LayoutParams
+    }
+
+    fun interface Callback {
+        fun add(plant: AdDetails?)
     }
 }

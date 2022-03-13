@@ -12,5 +12,6 @@
     <string name="avito_key">af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir</string>
 
     <string name="ad_details_title">Ad details</string>
+    <string name="ad_details_fab_description">Track ad</string>
 
 </resources>

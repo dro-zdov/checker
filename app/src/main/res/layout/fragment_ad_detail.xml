@@ -8,6 +8,9 @@
         <variable
             name="adDetails"
             type="com.codesample.checker.entities.details.AdDetails"/>
+        <variable
+            name="callback"
+            type="com.codesample.checker.AdDetailFragment.Callback"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -34,6 +37,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -106,6 +110,18 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:onClick="@{() -> callback.add(adDetails)}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/ad_details_fab_description"
+            app:layout_anchor="@id/nsv"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_plus" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
