@@ -9,20 +9,25 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.codesample.checker.databinding.FragmentAdDetailBinding
+import com.codesample.checker.repo.AdDetailsRepository
 import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.viewmodels.AdDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AdDetailFragment : Fragment() {
     private val args: AdDetailFragmentArgs by navArgs()
     private val viewModel: AdDetailsViewModel by viewModels()
+    @Inject lateinit var repository: AdDetailsRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,18 +36,24 @@ class AdDetailFragment : Fragment() {
     ): View {
         val binding = FragmentAdDetailBinding.inflate(inflater, container, false)
 
-        viewModel.getAdDetails(args.adId).observe(viewLifecycleOwner) {
-            binding.adDetails = it
+        viewModel.getAdDetails(args.adId).observe(viewLifecycleOwner) { allHistory ->
+            binding.adDetails = allHistory[0].details
+            binding.isTracked = allHistory[0].rowId != null
             binding.executePendingBindings()
-            addImageViews(binding, it)
+            addImageViews(binding, allHistory[0].details)
         }
 
         binding.toolbar.setNavigationOnClickListener { view ->
             view.findNavController().navigateUp()
         }
 
-        binding.callback = Callback { adDetails ->
-            //TODO: save to db
+        binding.callback = Callback { adDetails, isTracked ->
+            if (isTracked) {
+                viewModel.deleteAdDetails(adDetails)
+            }
+            else {
+                viewModel.saveAdDetails(adDetails)
+            }
         }
 
         return binding.root
@@ -105,6 +116,6 @@ class AdDetailFragment : Fragment() {
     }
 
     fun interface Callback {
-        fun add(plant: AdDetails?)
+        fun add(details: AdDetails, isTracked: Boolean)
     }
 }

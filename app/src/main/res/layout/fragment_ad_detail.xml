@@ -5,9 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="com.codesample.checker.R"/>
         <variable
             name="adDetails"
             type="com.codesample.checker.entities.details.AdDetails"/>
+        <variable
+            name="isTracked"
+            type="java.lang.Boolean"/>
         <variable
             name="callback"
             type="com.codesample.checker.AdDetailFragment.Callback"/>
@@ -114,14 +118,14 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
-            android:onClick="@{() -> callback.add(adDetails)}"
+            android:onClick="@{() -> callback.add(adDetails, isTracked)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/ad_details_fab_description"
             app:layout_anchor="@id/nsv"
             app:layout_anchorGravity="bottom|end"
-            app:srcCompat="@drawable/ic_plus" />
+            app:imageDrawable="@{isTracked ? @drawable/ic_clear : @drawable/ic_plus}" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
