@@ -5,8 +5,10 @@ import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.entities.suggestion.SuggestionRequest
 import com.codesample.checker.entities.suggestion.SuggestionResult
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -31,6 +33,11 @@ interface AvitoService {
         @Query("key") key: String,
         @Body request: SuggestionRequest,
     ): SuggestionResult
+
+    @GET
+    suspend fun downloadFile(
+        @Url url: String
+    ): Response<ResponseBody>
 
     companion object {
         private const val BASE_URL = "https://m.avito.ru/"

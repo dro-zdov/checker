@@ -9,17 +9,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.codesample.checker.databinding.FragmentAdDetailBinding
+import com.codesample.checker.entities.db.AdDetailsContainer
 import com.codesample.checker.repo.AdDetailsRepository
 import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.viewmodels.AdDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import java.io.File
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
@@ -40,7 +40,7 @@ class AdDetailFragment : Fragment() {
             binding.adDetails = allHistory[0].details
             binding.isTracked = allHistory[0].rowId != null
             binding.executePendingBindings()
-            addImageViews(binding, allHistory[0].details)
+            addImageViews(binding, allHistory[0])
         }
 
         binding.toolbar.setNavigationOnClickListener { view ->
@@ -59,12 +59,16 @@ class AdDetailFragment : Fragment() {
         return binding.root
     }
 
-    private fun addImageViews(binding: FragmentAdDetailBinding, details: AdDetails) {
+    private fun addImageViews(binding: FragmentAdDetailBinding, container: AdDetailsContainer) {
         val mainLayout = binding.mainLayout
         val topViewId = binding.price.id
         val columnsCount = 4
 
-        val imageViews = details.images.map {
+        val collection = container.files.ifEmpty {
+            container.details.images
+        }
+
+        val imageViews = collection.map {
             val imageView = ImageView(requireContext())
             imageView.id = View.generateViewId()
             imageView.layoutParams = getImageLayoutParams()
@@ -102,10 +106,16 @@ class AdDetailFragment : Fragment() {
         constraintSet.applyTo(mainLayout)
 
         imageViews.forEachIndexed { i, imageView ->
-            Glide.with(requireContext())
-                .load(details.images[i].img100x75)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView)
+            Glide.with(requireContext()).run {
+                if (container.files.isEmpty()) {
+                    load(container.details.images[i].img100x75)
+                }
+                else {
+                    load(container.files[i])
+                }
+            }
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(imageView)
         }
     }
 

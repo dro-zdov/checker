@@ -12,9 +12,6 @@ import javax.inject.Inject
 
 class AdDetailsRepository @Inject constructor(private val adDetailsDao: AdDetailsDao) {
 
-    suspend fun insert(vararg details: AdDetails) =
-        adDetailsDao.insert(*details.map { AdDetailsContainer(null, it) }.toTypedArray())
-
     suspend fun insert(vararg details: AdDetailsContainer) = adDetailsDao.insert(*details)
 
     suspend fun delete(details: AdDetails) = adDetailsDao.delete(details.id)

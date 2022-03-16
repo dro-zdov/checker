@@ -7,7 +7,11 @@ import com.codesample.checker.entities.db.AdDetailsContainer
 import com.codesample.checker.entities.search.Item
 import com.codesample.checker.entities.suggestion.SuggestionRequest
 import com.codesample.checker.services.AvitoService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 class AvitoRepository @Inject constructor(
@@ -21,7 +25,7 @@ class AvitoRepository @Inject constructor(
         ).flow
     }
 
-    suspend fun getAdDetails(id: Long) = AdDetailsContainer(null, service.getAdDetails(id, key))
+    suspend fun getAdDetails(id: Long) = AdDetailsContainer(service.getAdDetails(id, key))
 
     suspend fun searchSuggestions(query: String): List<String> {
         val body = SuggestionRequest(
@@ -31,5 +35,24 @@ class AvitoRepository @Inject constructor(
         )
         val response = service.searchSuggestions(key, body)
         return response.result.map { it.text_item.title }
+    }
+
+    suspend fun downloadFile(url: String, file: File) = withContext(Dispatchers.IO) {
+        try {
+            val response = service.downloadFile(url)
+            response.body()!!.byteStream().use { input ->
+                FileOutputStream(file).use { output ->
+                    val buffer = ByteArray(4096)
+                    var read = 0
+                    while (input.read(buffer).also { read = it } != -1) {
+                        output.write(buffer, 0, read)
+                    }
+                }
+            }
+        }
+        catch (e: Exception) {
+            file.delete()
+            throw e
+        }
     }
 }

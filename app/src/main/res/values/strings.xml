@@ -14,4 +14,7 @@
     <string name="ad_details_title">Ad details</string>
     <string name="ad_details_fab_description">Track ad</string>
 
+    <string name="save_ad_details_notification_channel_name">Foreground notifications</string>
+    <string name="save_ad_details_notification_text">Saving data</string>
+
 </resources>
