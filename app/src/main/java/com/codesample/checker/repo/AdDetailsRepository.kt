@@ -12,7 +12,10 @@ import javax.inject.Inject
 
 class AdDetailsRepository @Inject constructor(private val adDetailsDao: AdDetailsDao) {
 
-    suspend fun insert(details: AdDetails) = adDetailsDao.insert(AdDetailsContainer(null, details))
+    suspend fun insert(vararg details: AdDetails) =
+        adDetailsDao.insert(*details.map { AdDetailsContainer(null, it) }.toTypedArray())
+
+    suspend fun insert(vararg details: AdDetailsContainer) = adDetailsDao.insert(*details)
 
     suspend fun delete(details: AdDetails) = adDetailsDao.delete(details.id)
 
@@ -24,4 +27,7 @@ class AdDetailsRepository @Inject constructor(private val adDetailsDao: AdDetail
             pagingSourceFactory = { adDetailsDao.getAllLatest() }
         ).flow
     }
+
+    fun getAllLatestList(): List<AdDetailsContainer> = adDetailsDao.getAllLatestList()
+
 }
