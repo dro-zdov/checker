@@ -3,12 +3,11 @@ package com.codesample.checker.viewmodels
 import android.content.Context
 import androidx.lifecycle.*
 import androidx.work.*
-import com.codesample.checker.CheckerApplication
 import com.codesample.checker.entities.db.AdDetailsContainer
 import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.repo.AdDetailsRepository
 import com.codesample.checker.repo.AvitoRepository
-import com.codesample.checker.workers.CheckAdUpdatesWorker
+import com.codesample.checker.workers.DeleteAdDetailsWorker
 import com.codesample.checker.workers.SaveAdDetailsWorker
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +15,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,6 +52,7 @@ class AdDetailsViewModel @Inject constructor(
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresStorageNotLow(true)
                 .build()
 
             val request = OneTimeWorkRequestBuilder<SaveAdDetailsWorker>()
@@ -63,7 +62,7 @@ class AdDetailsViewModel @Inject constructor(
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(
-                adDetails.id.toString(),
+                "save_${adDetails.id}",
                 ExistingWorkPolicy.REPLACE,
                 request
             )
@@ -71,8 +70,15 @@ class AdDetailsViewModel @Inject constructor(
     }
 
     fun deleteAdDetails(adDetails: AdDetails) {
-        viewModelScope.launch(Dispatchers.IO) {
-            localRepo.delete(adDetails)
-        }
+        val request = OneTimeWorkRequestBuilder<DeleteAdDetailsWorker>()
+            .setInputData(workDataOf(DeleteAdDetailsWorker.KEY_AD_DETAILS_ID to adDetails.id))
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "delete_${adDetails.id}",
+            ExistingWorkPolicy.REPLACE,
+            request
+        )
     }
 }

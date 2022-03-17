@@ -5,8 +5,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.codesample.checker.db.AdDetailsDao
 import com.codesample.checker.entities.db.AdDetailsContainer
-import com.codesample.checker.entities.details.AdDetails
-import com.codesample.checker.entities.search.Item
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -14,9 +12,11 @@ class AdDetailsRepository @Inject constructor(private val adDetailsDao: AdDetail
 
     suspend fun insert(vararg details: AdDetailsContainer) = adDetailsDao.insert(*details)
 
-    suspend fun delete(details: AdDetails) = adDetailsDao.delete(details.id)
+    suspend fun delete(id: Long) = adDetailsDao.delete(id)
 
     fun getHistory(id: Long) = adDetailsDao.getHistory(id)
+
+    suspend fun getHistoryList(id: Long) = adDetailsDao.getHistoryList(id)
 
     fun getAllLatest(): Flow<PagingData<AdDetailsContainer>> {
         return Pager(
@@ -25,6 +25,6 @@ class AdDetailsRepository @Inject constructor(private val adDetailsDao: AdDetail
         ).flow
     }
 
-    fun getAllLatestList(): List<AdDetailsContainer> = adDetailsDao.getAllLatestList()
+    suspend fun getAllLatestList(): List<AdDetailsContainer> = adDetailsDao.getAllLatestList()
 
 }

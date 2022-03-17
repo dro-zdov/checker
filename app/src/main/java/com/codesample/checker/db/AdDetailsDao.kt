@@ -12,27 +12,22 @@ interface AdDetailsDao {
     @Insert
     suspend fun insert(vararg details: AdDetailsContainer)
 
-    @Query("""
-        DELETE FROM ad_details
-        WHERE id = :id
-    """)
+    @Query(DELETE_BY_ID_QUERY)
     suspend fun delete(id: Long)
 
-    @Query("""
-        SELECT * 
-        FROM ad_details
-        WHERE id = :id
-        ORDER BY time
-    """)
+    @Query(ALL_HISTORY_QUERY)
     fun getHistory(id: Long): LiveData<List<AdDetailsContainer>>
+
+    @Query(ALL_HISTORY_QUERY)
+    suspend fun getHistoryList(id: Long): List<AdDetailsContainer>
 
     @Query(ALL_LATEST_QUERY)
     fun getAllLatest(): PagingSource<Int, AdDetailsContainer>
 
     @Query(ALL_LATEST_QUERY)
-    fun getAllLatestList(): List<AdDetailsContainer>
+    suspend fun getAllLatestList(): List<AdDetailsContainer>
 
-    companion object {
+    companion object Queries {
         private const val ALL_LATEST_QUERY = """
             WITH id_and_max_time AS (
                 SELECT id, MAX(time) AS time 
@@ -43,6 +38,18 @@ interface AdDetailsDao {
             FROM ad_details
             INNER JOIN id_and_max_time 
             ON ad_details.id = id_and_max_time.id AND ad_details.time = id_and_max_time.time    
+        """
+
+        private const val ALL_HISTORY_QUERY = """
+            SELECT * 
+            FROM ad_details
+            WHERE id = :id
+            ORDER BY time DESC
+        """
+
+        private const val DELETE_BY_ID_QUERY = """
+            DELETE FROM ad_details
+            WHERE id = :id
         """
     }
 }

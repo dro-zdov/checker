@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.codesample.checker.entities.db.AdDetailsContainer
 import com.codesample.checker.repo.AdDetailsRepository
 import com.codesample.checker.repo.AvitoRepository
+import com.codesample.checker.utils.ImageUtil
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import retrofit2.HttpException
@@ -16,7 +17,8 @@ class CheckAdUpdatesWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val remoteRepo: AvitoRepository,
-    private val localRepo: AdDetailsRepository
+    private val localRepo: AdDetailsRepository,
+    private val imageUtil: ImageUtil
 ): CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -36,6 +38,10 @@ class CheckAdUpdatesWorker @AssistedInject constructor(
                 }
                 .filter { pair -> pair.isDifferent() }
                 .mapNotNull { pair -> pair.fromNetwork }
+                .map { update ->
+                    val files = imageUtil.downloadImages(update.details.images)
+                    AdDetailsContainer(update.details, files)
+                }
 
             if (updates.isNotEmpty()) {
                 localRepo.insert(*updates.toTypedArray())
