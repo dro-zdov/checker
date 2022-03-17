@@ -6,7 +6,7 @@
     <data>
         <variable
             name="adDetails"
-            type="com.codesample.checker.entities.details.AdDetails"/>
+            type="com.codesample.checker.entities.db.AdDetailsContainer"/>
         <variable
             name="clickListener"
             type="android.view.View.OnClickListener"/>
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
-            app:imageFromUrl="@{adDetails.images[0].img100x75}"
+            app:imageFromFile="@{adDetails.files[0]}"
             app:layout_constraintDimensionRatio="4:3"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{adDetails.title}"
+            android:text="@{adDetails.details.title}"
             android:textSize="18sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/guideline_tl"
@@ -50,7 +50,7 @@
             android:id="@+id/description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{adDetails.address}"
+            android:text="@{adDetails.details.address}"
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintStart_toEndOf="@id/guideline_tl"
             app:layout_constraintEnd_toEndOf="parent"/>

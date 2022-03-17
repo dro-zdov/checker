@@ -36,7 +36,7 @@ class TrackedListViewHolder(
     init {
         binding.setClickListener { view ->
             binding.adDetails?.let { item ->
-                navigateToAd(item, view)
+                navigateToAd(item.details, view)
             }
         }
     }
@@ -47,7 +47,7 @@ class TrackedListViewHolder(
     }
 
     fun bind(item: AdDetailsContainer) {
-        binding.adDetails = item.details
+        binding.adDetails = item
         binding.executePendingBindings()
     }
 }
