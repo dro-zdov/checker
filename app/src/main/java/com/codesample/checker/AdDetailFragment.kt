@@ -19,7 +19,6 @@ import com.codesample.checker.repo.AdDetailsRepository
 import com.codesample.checker.entities.details.AdDetails
 import com.codesample.checker.viewmodels.AdDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
@@ -40,7 +39,7 @@ class AdDetailFragment : Fragment() {
             binding.adDetails = allHistory[0].details
             binding.isTracked = allHistory[0].rowId != null
             binding.executePendingBindings()
-            addImageViews(binding, allHistory[0])
+            recreateImageViews(binding, allHistory[0])
         }
 
         binding.toolbar.setNavigationOnClickListener { view ->
@@ -59,10 +58,16 @@ class AdDetailFragment : Fragment() {
         return binding.root
     }
 
-    private fun addImageViews(binding: FragmentAdDetailBinding, container: AdDetailsContainer) {
+    private fun recreateImageViews(binding: FragmentAdDetailBinding, container: AdDetailsContainer) {
         val mainLayout = binding.mainLayout
         val topViewId = binding.price.id
         val columnsCount = 4
+
+        //Remove old views
+        var oldImageView: ImageView?
+        while (null != mainLayout.findViewWithTag<ImageView>(IMAGE_VIEW_TAG).also { oldImageView = it }) {
+            mainLayout.removeView(oldImageView)
+        }
 
         val collection = container.files.ifEmpty {
             container.details.images
@@ -71,6 +76,7 @@ class AdDetailFragment : Fragment() {
         val imageViews = collection.map {
             val imageView = ImageView(requireContext())
             imageView.id = View.generateViewId()
+            imageView.tag = IMAGE_VIEW_TAG
             imageView.layoutParams = getImageLayoutParams()
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
             mainLayout.addView(imageView)
@@ -127,5 +133,9 @@ class AdDetailFragment : Fragment() {
 
     fun interface Callback {
         fun add(details: AdDetails, isTracked: Boolean)
+    }
+
+    companion object {
+        private const val IMAGE_VIEW_TAG = "imageViewTag"
     }
 }
