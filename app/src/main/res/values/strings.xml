@@ -17,4 +17,6 @@
     <string name="save_ad_details_notification_channel_name">Foreground notifications</string>
     <string name="save_ad_details_notification_text">Saving data</string>
 
+    <string name="date_format">yyyy.MM.dd</string>
+
 </resources>
