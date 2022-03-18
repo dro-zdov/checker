@@ -16,4 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
+    companion object {
+        const val FLAG_NAVIGATE_TO_TRACKED_LIST = "navigateToTrackedList"
+    }
 }

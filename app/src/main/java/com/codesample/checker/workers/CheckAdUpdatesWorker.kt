@@ -1,9 +1,17 @@
 package com.codesample.checker.workers
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.codesample.checker.MainActivity
+import com.codesample.checker.R
 import com.codesample.checker.entities.db.AdDetailsContainer
 import com.codesample.checker.repo.AdDetailsRepository
 import com.codesample.checker.repo.AvitoRepository
@@ -55,7 +63,41 @@ class CheckAdUpdatesWorker @AssistedInject constructor(
     }
 
     private fun showNotification() {
-        //TODO: show
+        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                MAIN_NOTIFICATION_CHANNEL_ID,
+                applicationContext.getString(R.string.main_notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(MainActivity.FLAG_NAVIGATE_TO_TRACKED_LIST, true)
+        }
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(applicationContext, 0, intent,flags)
+
+        val notification = NotificationCompat.Builder(applicationContext, MAIN_NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(applicationContext.getString(R.string.app_name))
+            .setContentText(applicationContext.getString(R.string.some_ads_has_changed_message))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(SOME_ADS_CHANGED_NOTIFICATION_ID, notification)
     }
 
     data class DbAndNetworkPair(
@@ -65,6 +107,11 @@ class CheckAdUpdatesWorker @AssistedInject constructor(
         fun isDifferent(): Boolean {
             return fromDb.details != fromNetwork?.details
         }
+    }
+
+    companion object {
+        const val SOME_ADS_CHANGED_NOTIFICATION_ID = 3
+        const val MAIN_NOTIFICATION_CHANNEL_ID = "mainNotificationChannelId"
     }
 
 }

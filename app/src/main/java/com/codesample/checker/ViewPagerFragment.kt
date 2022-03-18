@@ -32,7 +32,12 @@ class ViewPagerFragment: Fragment() {
             tab.text = getTabTitle(position)
         }.attach()
 
-        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        with(activity as AppCompatActivity) {
+            setSupportActionBar(binding.toolbar)
+            if (intent.hasExtra(MainActivity.FLAG_NAVIGATE_TO_TRACKED_LIST)) {
+                viewPager.currentItem = 1 // Tracked list tab
+            }
+        }
 
         return binding.root
     }

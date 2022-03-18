@@ -38,6 +38,6 @@ abstract class AbstractForegroundWorker(
     }
 
     companion object {
-        private const val WORKER_NOTIFICATION_CHANNEL_ID = "saveAdDetailsWorker"
+        private const val WORKER_NOTIFICATION_CHANNEL_ID = "workerNotificationChannelId"
     }
 }
