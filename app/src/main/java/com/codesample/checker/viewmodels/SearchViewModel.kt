@@ -1,9 +1,6 @@
 package com.codesample.checker.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.codesample.checker.entities.search.Item
@@ -11,48 +8,48 @@ import com.codesample.checker.repo.AvitoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val repo: AvitoRepository
 ) : ViewModel() {
-    private val mSuggestions = MutableLiveData<List<String>>()
-    private var mSuggestionsJob: Job? = null
-    private var mLastPagingData: Flow<PagingData<Item>> = getEmptyPaging()
-    private var mLastQuery: String? = null
+    private val suggestionText = MutableLiveData<String?>()
 
-    val suggestions: LiveData<List<String>> get() = mSuggestions
-    val lastQuery: String? get() = mLastQuery
+    fun setSuggestionText(text: String?) {
+        suggestionText.value = text
+    }
 
-    fun searchSuggestions(query: String?) {
-        mSuggestionsJob?.cancel() // Cancel previous job, if any
-        if (query == null || query.isEmpty() ) {
-            mSuggestions.value = listOf()
-        }
-        else {
-            mSuggestionsJob = viewModelScope.launch(Dispatchers.IO) {
+    val suggestions: LiveData<List<String>> = Transformations.switchMap(suggestionText) { text ->
+        liveData {
+            if (text.isNullOrEmpty()) {
+                emit(listOf())
+            }
+            else try {
                 delay(200) // Debounce
-                val result = try {
-                    repo.searchSuggestions(query)
+                if (suggestionText.value == text) {
+                    val suggestions = withContext(Dispatchers.IO) {
+                        repo.searchSuggestions(text)
+                    }
+                    emit(suggestions)
                 }
-                catch (e: Exception) {
-                    listOf()
-                }
-                withContext(Dispatchers.Main) {
-                    mSuggestions.value = result
-                }
+            }
+            catch (e: Exception) {
+                emit(listOf())
             }
         }
     }
 
-    fun searchAds(query: String?): Flow<PagingData<Item>> {
-        if (mLastQuery != query) {
-            mLastQuery = query
-            mLastPagingData = repo.getSearchAdsStream(query).cachedIn(viewModelScope)
-        }
-        return mLastPagingData
+    private val queryText = MutableStateFlow<String?>(null)
+
+    fun setQueryText(text: String?) {
+        queryText.value = text
     }
 
-    private fun getEmptyPaging() = repo.getSearchAdsStream(null).cachedIn(viewModelScope)
+    val items = queryText.flatMapLatest { text ->
+        repo.getSearchAdsStream(text)
+    }.cachedIn(viewModelScope)
+
 }

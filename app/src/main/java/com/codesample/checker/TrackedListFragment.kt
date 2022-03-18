@@ -22,8 +22,8 @@ class TrackedListFragment : Fragment() {
     private val adapter = TrackedListAdapter()
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         val binding = FragmentTrackedListBinding.inflate(inflater, container, false)
 

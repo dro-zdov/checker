@@ -24,24 +24,30 @@ class AdDetailsViewModel @Inject constructor(
     private val localRepo: AdDetailsRepository,
     private val gson: Gson
 ) : ViewModel() {
-    private var details: LiveData<List<AdDetailsContainer>>? = null
+    private var adDetailsId = MutableLiveData<Long?>(null)
 
-    fun getAdDetails(id: Long) = details ?: getAdDetailsInternal(id).also { details = it }
-
-    private fun getAdDetailsInternal(id: Long): LiveData<List<AdDetailsContainer>> {
-        return Transformations.switchMap(localRepo.getHistory(id)) {
-            if (it.isEmpty()) { // No db entries, ad is not tracked
-                getAdDetailsNetwork(id)
-            }
-            else {
-                MutableLiveData(it)
-            }
-        }
+    fun setId(id: Long) {
+        adDetailsId.value = id
     }
 
-    private fun getAdDetailsNetwork(id: Long) = liveData(Dispatchers.IO) {
-        val adDetails = remoteRepo.getAdDetails(id)
-        emit(listOf(adDetails))
+    val history: LiveData<List<AdDetailsContainer>> = Transformations.switchMap(adDetailsId) { id ->
+        if (id != null) {
+            Transformations.switchMap(localRepo.getHistory(id)) { dbHistory ->
+                if (dbHistory.isEmpty()) { // No db entries, ad is not tracked
+                    liveData {
+                        val response = withContext(Dispatchers.IO) {
+                            remoteRepo.getAdDetails(id)
+                        }
+                        emit(listOf(response))
+                    }
+                } else {
+                    MutableLiveData(dbHistory)
+                }
+            }
+        }
+        else {
+            MutableLiveData(listOf())
+        }
     }
 
     fun saveAdDetails(adDetails: AdDetails) {

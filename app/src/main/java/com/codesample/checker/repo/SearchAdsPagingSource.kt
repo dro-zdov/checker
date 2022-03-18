@@ -4,6 +4,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.codesample.checker.entities.search.Item
 import com.codesample.checker.services.AvitoService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class SearchAdsPagingSource(
     private val service: AvitoService,
@@ -21,12 +23,14 @@ class SearchAdsPagingSource(
         else try {
             val pageNumber = params.key ?: 1
             val loadSize = params.loadSize
-            val response = service.searchAds(
-                query,
-                pageNumber,
-                loadSize,
-                key
-            )
+            val response = withContext(Dispatchers.IO) {
+                service.searchAds(
+                    query,
+                    pageNumber,
+                    loadSize,
+                    key
+                )
+            }
             val items = response.result.items.filter { it.type == "item" }
 
             return LoadResult.Page(
