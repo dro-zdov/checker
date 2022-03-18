@@ -30,23 +30,34 @@ class AdDetailsViewModel @Inject constructor(
         adDetailsId.value = id
     }
 
-    val history: LiveData<List<AdDetailsContainer>> = Transformations.switchMap(adDetailsId) { id ->
+    val history: LiveData<DataOrException> = Transformations.switchMap(adDetailsId) { id ->
         if (id != null) {
-            Transformations.switchMap(localRepo.getHistory(id)) { dbHistory ->
+            val dbHistory = try {
+                localRepo.getHistory(id)
+            }
+            catch (e: Exception) {
+                return@switchMap MutableLiveData(DataOrException(e))
+            }
+            Transformations.switchMap(dbHistory) { dbHistory ->
                 if (dbHistory.isEmpty()) { // No db entries, ad is not tracked
                     liveData {
-                        val response = withContext(Dispatchers.IO) {
-                            remoteRepo.getAdDetails(id)
+                        try {
+                            val response = withContext(Dispatchers.IO) {
+                                remoteRepo.getAdDetails(id)
+                            }
+                            emit(DataOrException(listOf(response)))
                         }
-                        emit(listOf(response))
+                        catch (e: Exception) {
+                            emit(DataOrException(e))
+                        }
                     }
                 } else {
-                    MutableLiveData(dbHistory)
+                    MutableLiveData(DataOrException(dbHistory))
                 }
             }
         }
         else {
-            MutableLiveData(listOf())
+            MutableLiveData(DataOrException(listOf()))
         }
     }
 
@@ -86,5 +97,13 @@ class AdDetailsViewModel @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             request
         )
+    }
+
+    data class DataOrException(
+        val data: List<AdDetailsContainer>?,
+        val exception: Exception?
+    ) {
+        constructor(data: List<AdDetailsContainer>): this(data, null)
+        constructor(exception: Exception): this(null, exception)
     }
 }

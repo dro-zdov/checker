@@ -12,17 +12,23 @@ import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import com.codesample.checker.adapters.SearchAdsAdapter
 import com.codesample.checker.databinding.FragmentSearchBinding
+import com.codesample.checker.utils.SnackbarUtil
 import com.codesample.checker.viewmodels.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
-
+    @Inject lateinit var snackbarUtil: SnackbarUtil
     private val viewModel by viewModels<SearchViewModel>()
     private val adapter = SearchAdsAdapter()
 
@@ -34,6 +40,18 @@ class SearchFragment : Fragment() {
 
         setupSearchView(binding.searchView)
         binding.adsList.adapter = adapter
+
+        lifecycleScope.launch {
+            viewModel.items.collectLatest { pagingData ->
+                adapter.submitData(pagingData)
+            }
+        }
+
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                handleLoadStates(binding.root, loadStates)
+            }
+        }
 
         return binding.root
     }
@@ -92,14 +110,19 @@ class SearchFragment : Fragment() {
             }
             scAdapter.swapCursor(cursor)
         }
-
-        lifecycleScope.launch {
-            viewModel.items.collectLatest {
-                adapter.submitData(it)
-            }
-        }
     }
 
     private fun createMatrixCursor() = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+
+    private fun handleLoadStates(root: View, loadStates: CombinedLoadStates) = with(loadStates) {
+        listOf(refresh, append, prepend).forEach { loadState ->
+            if (loadState is LoadState.Error) {
+                snackbarUtil.showLoadError(root, loadState.error)
+                if (adapter.itemCount == 0) {
+                    viewModel.setQueryText(null) //Clear error after showing it
+                }
+            }
+        }
+    }
 
 }

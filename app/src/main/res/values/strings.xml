@@ -22,4 +22,6 @@
 
     <string name="date_format">yyyy.MM.dd</string>
 
+    <string name="load_error_message">Error</string>
+
 </resources>
