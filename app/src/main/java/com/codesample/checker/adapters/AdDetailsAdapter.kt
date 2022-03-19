@@ -10,10 +10,11 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.codesample.checker.AdDetailFragment
 import com.codesample.checker.R
 import com.codesample.checker.databinding.AdDetailsItemBinding
 import com.codesample.checker.entities.db.AdDetailsContainer
+import com.codesample.checker.entities.details.Image
+import java.io.File
 
 class AdDetailsAdapter(
     private val history: List<AdDetailsContainer>
@@ -58,7 +59,7 @@ class AdDetailsViewHolder(
         }
 
         val collection = container.files.ifEmpty {
-            container.details.images
+            container.details.images ?: return
         }
 
         val imageViews = collection.map {
@@ -100,12 +101,13 @@ class AdDetailsViewHolder(
         constraintSet.applyTo(mainLayout)
 
         imageViews.forEachIndexed { i, imageView ->
+            val item = collection[i]
             Glide.with(context).run {
-                if (container.files.isEmpty()) {
-                    load(container.details.images[i].img100x75)
+                if (item is Image) {
+                    load(item.img100x75)
                 }
                 else {
-                    load(container.files[i])
+                    load(item as File)
                 }
             }
             .transition(DrawableTransitionOptions.withCrossFade())

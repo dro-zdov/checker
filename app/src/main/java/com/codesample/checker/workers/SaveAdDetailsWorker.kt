@@ -11,7 +11,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.util.*
 
 @HiltWorker
 class SaveAdDetailsWorker @AssistedInject constructor(
@@ -26,7 +25,7 @@ class SaveAdDetailsWorker @AssistedInject constructor(
         return try {
             val json = inputData.getString(KEY_AD_DETAILS) ?: return Result.failure()
             val adDetails = gson.fromJson<AdDetails>(json, object : TypeToken<AdDetails>() {}.type)
-            val files = imageUtil.downloadImages(adDetails.images)
+            val files = imageUtil.downloadImages(adDetails.images ?: emptyList())
             val container = AdDetailsContainer(adDetails, files)
             localRepo.insert(container)
 

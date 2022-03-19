@@ -47,7 +47,7 @@ class CheckAdUpdatesWorker @AssistedInject constructor(
                 .filter { pair -> pair.isDifferent() }
                 .mapNotNull { pair -> pair.fromNetwork }
                 .map { update ->
-                    val files = imageUtil.downloadImages(update.details.images)
+                    val files = imageUtil.downloadImages(update.details.images ?: emptyList())
                     AdDetailsContainer(update.details, files)
                 }
 
