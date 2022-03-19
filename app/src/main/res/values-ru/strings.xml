@@ -1,0 +1,20 @@
+<resources>
+    <string name="search_tab_title">Поиск</string>
+    <string name="tracked_list_tab_title">Отслеживаемые</string>
+
+    <string name="search_hint">Введите запрос</string>
+
+    <string name="ad_details_title">Детали объявления</string>
+    <string name="ad_details_fab_description">Отслеживать</string>
+
+    <string name="save_ad_details_notification_channel_name">Фоновые уведомления</string>
+    <string name="save_ad_details_notification_text">Сохранение данных</string>
+
+    <string name="main_notification_channel_name">Основные уведомления</string>
+    <string name="some_ads_has_changed_message">Некоторые объявления изменились</string>
+
+    <string name="date_format">dd.MM.yyyy</string>
+
+    <string name="load_error_message">Ошибка</string>
+
+</resources>
