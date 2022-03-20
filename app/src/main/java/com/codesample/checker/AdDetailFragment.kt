@@ -70,6 +70,11 @@ class AdDetailFragment : Fragment() {
     }
 
     private fun handleException(binding: FragmentAdDetailBinding, exception: Exception) {
+        val adapter = AdDetailsAdapter(emptyList())
+        binding.headItem = null
+        binding.isTracked = false
+        binding.adDetails.adapter = adapter
+        binding.executePendingBindings()
         snackbarUtil.showLoadError(binding.root, exception)
     }
 

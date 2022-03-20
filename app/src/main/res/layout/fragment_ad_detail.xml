@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
         <variable
             name="headItem"
             type="com.codesample.checker.entities.details.AdDetails"/>
@@ -56,6 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/ad_details_fab_description"
+            android:visibility="@{headItem == null ? View.GONE : View.VISIBLE}"
             app:layout_anchor="@id/adDetails"
             app:layout_anchorGravity="bottom|end"
             app:imageDrawable="@{isTracked ? @drawable/ic_clear : @drawable/ic_plus}" />
