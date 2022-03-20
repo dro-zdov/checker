@@ -41,6 +41,10 @@ class SearchFragment : Fragment() {
         setupSearchView(binding.searchView)
         binding.adsList.adapter = adapter
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            adapter.refresh()
+        }
+
         lifecycleScope.launch {
             viewModel.items.collectLatest { pagingData ->
                 adapter.submitData(pagingData)
@@ -49,7 +53,7 @@ class SearchFragment : Fragment() {
 
         lifecycleScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                handleLoadStates(binding.root, loadStates)
+                handleLoadStates(binding, loadStates)
             }
         }
 
@@ -114,13 +118,13 @@ class SearchFragment : Fragment() {
 
     private fun createMatrixCursor() = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
 
-    private fun handleLoadStates(root: View, loadStates: CombinedLoadStates) = with(loadStates) {
+    private fun handleLoadStates(binding: FragmentSearchBinding, loadStates: CombinedLoadStates) = with(loadStates) {
         listOf(refresh, append, prepend).forEach { loadState ->
             if (loadState is LoadState.Error) {
-                snackbarUtil.showLoadError(root, loadState.error)
-                if (adapter.itemCount == 0) {
-                    viewModel.setQueryText(null) //Clear error after showing it
-                }
+                snackbarUtil.showLoadError(binding.root, loadState.error)
+            }
+            if (loadState is LoadState.NotLoading) {
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }

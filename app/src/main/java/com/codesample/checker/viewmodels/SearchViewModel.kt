@@ -1,15 +1,14 @@
 package com.codesample.checker.viewmodels
 
 import androidx.lifecycle.*
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.codesample.checker.entities.search.Item
 import com.codesample.checker.repo.AvitoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
